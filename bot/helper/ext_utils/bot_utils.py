@@ -400,19 +400,36 @@ def pop_up_stats(update, context):
     query = update.callback_query
     stats = bot_sys_stats()
     query.answer(text=stats, show_alert=True)
-
 def bot_sys_stats():
-    currentTime = get_readable_time(time.time() - botStartTime)
+    currentTime = get_readable_time(time() - botStartTime)
     cpu = psutil.cpu_percent()
     mem = psutil.virtual_memory().percent
-    disk = psutil.disk_usage("/").percent
-    total, used, free = shutil.disk_usage('.')
+    disk = psutil.disk_usage(DOWNLOAD_DIR).percent
+    total, used, free = shutil.disk_usage(DOWNLOAD_DIR)
     total = get_readable_file_size(total)
     used = get_readable_file_size(used)
     free = get_readable_file_size(free)
     recv = get_readable_file_size(psutil.net_io_counters().bytes_recv)
     sent = get_readable_file_size(psutil.net_io_counters().bytes_sent)
-    stats = f"""
+    num_active = 0
+    num_upload = 0
+    num_split = 0
+    num_extract = 0
+    num_archi = 0
+    tasks = len(download_dict)
+    for stats in list(download_dict.values()):
+       if stats.status() == MirrorStatus.STATUS_DOWNLOADING:
+                num_active += 1
+       if stats.status() == MirrorStatus.STATUS_UPLOADING:
+                num_upload += 1
+       if stats.status() == MirrorStatus.STATUS_ARCHIVING:
+                num_archi += 1
+       if stats.status() == MirrorStatus.STATUS_EXTRACTING:
+                num_extract += 1
+       if stats.status() == MirrorStatus.STATUS_SPLITTING:
+                num_split += 1
+    stats = f"Bot Statistics"
+    stats += f"""
 BOT UPTIME: {currentTime}
 
 CPU : {progress_bar(cpu)} {cpu}%
