@@ -41,6 +41,17 @@ class MirrorStatus:
     STATUS_CHECKING = "CheckingUp...📝"
     STATUS_SEEDING = "Seeding...🌧"
 
+class EngineStatus:
+    STATUS_ARIA = "Aria2c"
+    STATUS_GDRIVE = "Google API"
+    STATUS_MEGA = "Mega API"
+    STATUS_QB = "qBittorrent"
+    STATUS_TG = "Pyrogram - Uploading on TG"
+    STATUS_YT = "Yt-dlp"
+    STATUS_EXT = "extract | pextract"
+    STATUS_SPLIT = "FFmpeg"
+    STATUS_ZIP = "7z"
+
 SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 
 
@@ -187,6 +198,8 @@ def get_readable_message():
                 else:
                     msg += f"\n<b>Downloaded:</b> {get_readable_file_size(download.processed_bytes())} of {download.size()}"
                 msg += f"\n<b>Speed:</b> {download.speed()} | <b>ETA:</b> {download.eta()}"
+                msg += f"\n<b>Time Elapsed: </b>{get_readable_time(time() - download.message.date.timestamp())}"
+                msg += f"\n<b>Engine:</b> {download.eng()}"
                 try:
                     msg += f"\n<b>Engine:</b> <i>Aria2c</i> | <b>Seeders :</b> {download.aria_download().num_seeders}"   
                 except:
@@ -205,6 +218,7 @@ def get_readable_message():
             elif download.status() == MirrorStatus.STATUS_SEEDING:
                 msg += f"\n<b>Size: </b>{download.size()}"
                 msg += f"\n<b>Speed: </b>{get_readable_file_size(download.torrent_info().upspeed)}/s"
+                msg += f"\n<b>Engine:</b> {download.eng()}"
                 msg += f" | <b>Uploaded: </b>{get_readable_file_size(download.torrent_info().uploaded)}"
                 msg += f"\n<b>Ratio: </b>{round(download.torrent_info().ratio, 3)}"
                 msg += f" | <b>Time: </b>{get_readable_time(download.torrent_info().seeding_time)}"
