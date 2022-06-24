@@ -47,8 +47,8 @@ class EngineStatus:
     STATUS_MEGA = "Mega API"
     STATUS_QB = "qBittorrent"
     STATUS_TG = "Pyrogram - Uploading on TG"
-    STATUS_YT = "Yt-dlp"
-    STATUS_EXT = "extract | pextract"
+    STATUS_YT = "Yt-Dlp"
+    STATUS_EXT = "Extract | Pextract"
     STATUS_SPLIT = "FFmpeg"
     STATUS_ZIP = "7z"
 
@@ -72,6 +72,52 @@ class setInterval:
     def cancel(self):
         self.stopEvent.set()
         
+def sendMessage(text: str, bot, update: Update):
+    try:
+        return bot.send_message(update.message.chat_id,
+                            reply_to_message_id=update.message.message_id,
+                            text=text, allow_sending_without_reply=True, parse_mode='HTMl', disable_web_page_preview=True)
+    except RetryAfter as r:
+        LOGGER.warning(str(r))
+        time.sleep(r.retry_after * 1.5)
+        return sendMessage(text, bot, update)
+    except Exception as e:
+        LOGGER.error(str(e))
+        return
+
+def sendMarkup(text: str, bot, update: Update, reply_markup: InlineKeyboardMarkup):
+    try:
+        return bot.send_message(update.message.chat_id,
+                            reply_to_message_id=update.message.message_id,
+                            text=text, reply_markup=reply_markup, allow_sending_without_reply=True,
+                            parse_mode='HTMl', disable_web_page_preview=True)
+    except RetryAfter as r:
+        LOGGER.error(str(r))
+        time.sleep(r.retry_after)
+        return sendMarkup(text, bot, update, reply_markup)
+    except Exception as e:
+        LOGGER.error(str(e))
+
+def editMessage(text: str, message: Message, reply_markup=None):
+    try:
+        bot.edit_message_text(text=text, message_id=message.message_id,
+                              chat_id=message.chat.id,reply_markup=reply_markup,
+                              parse_mode='HTMl', disable_web_page_preview=True)
+    except RetryAfter as r:
+        LOGGER.warning(str(r))
+        time.sleep(r.retry_after * 1.5)
+        return editMessage(text, message, reply_markup)
+    except Exception as e:
+        LOGGER.error(str(e))
+        return
+
+def deleteMessage(bot, message: Message):
+    try:
+        bot.delete_message(chat_id=message.chat.id,
+                           message_id=message.message_id)
+    except Exception as e:
+        LOGGER.error(str(e))
+
 def auto_delete_message(bot, cmd_message: Message, bot_message: Message):
     if AUTO_DELETE_MESSAGE_DURATION != -1:
         time.sleep(AUTO_DELETE_MESSAGE_DURATION)
@@ -82,13 +128,6 @@ def auto_delete_message(bot, cmd_message: Message, bot_message: Message):
         except AttributeError:
             pass
         
-def deleteMessage(bot, message: Message):
-    try:
-        bot.delete_message(chat_id=message.chat.id,
-                           message_id=message.message_id)
-    except Exception as e:
-        LOGGER.error(str(e))
-        
 def delete_all_messages():
     with status_reply_dict_lock:
         for message in list(status_reply_dict.values()):
@@ -97,6 +136,36 @@ def delete_all_messages():
                 del status_reply_dict[message.chat.id]
             except Exception as e:
                 LOGGER.error(str(e))
+                
+ def update_all_messages():
+    msg, buttons = get_readable_message()
+    with status_reply_dict_lock:
+        for chat_id in list(status_reply_dict.keys()):
+            if status_reply_dict[chat_id] and msg != status_reply_dict[chat_id].text:
+                if buttons == "":
+                    editMessage(msg, status_reply_dict[chat_id])
+                else:
+                    editMessage(msg, status_reply_dict[chat_id], buttons)
+                status_reply_dict[chat_id].text = msg  
+                
+def sendStatusMessage(msg, bot):
+    if len(Interval) == 0:
+        Interval.append(setInterval(DOWNLOAD_STATUS_UPDATE_INTERVAL, update_all_messages))
+    progress, buttons = get_readable_message()
+    with status_reply_dict_lock:
+        if msg.message.chat.id in list(status_reply_dict):
+            try:
+                message = status_reply_dict[msg.message.chat.id]
+                deleteMessage(bot, message)
+                del status_reply_dict[msg.message.chat.id]
+            except Exception as e:
+                LOGGER.error(str(e))
+                del status_reply_dict[msg.message.chat.id]
+        if buttons == "":
+            message = sendMessage(progress, bot, msg)
+        else:
+            message = sendMarkup(progress, bot, msg, buttons)
+        status_reply_dict[msg.message.chat.id] = message
 
 def get_readable_file_size(size_in_bytes) -> str:
     if size_in_bytes is None:
@@ -201,11 +270,13 @@ def get_readable_message():
                 msg += f"\n<b>Time Elapsed: </b>{get_readable_time(time() - download.message.date.timestamp())}"
                 msg += f"\n<b>Engine:</b> {download.eng()}"
                 try:
-                    msg += f"\n<b>Engine:</b> <i>Aria2c</i> | <b>Seeders :</b> {download.aria_download().num_seeders}"   
+                    msg += f"\n<b>Seeders:</b> {download.aria_download().num_seeders}" \
+                           f" | <b>Peers:</b> {download.aria_download().connections}"
                 except:
                     pass
                 try:
-                    msg += f"\n<b>Engine:</b> <i>qBittorrent</i> | <b>Seeders:</b> {download.torrent_info().num_seeds}"
+                    msg += f"\n<b>Seeders:</b> {download.torrent_info().num_seeds}" \
+                           f" | <b>Leechers:</b> {download.torrent_info().num_leechs}"
                 except:
                     pass
                 reply_to = download.message.reply_to_message    
@@ -214,7 +285,7 @@ def get_readable_message():
                 else:
                     msg += f"\n<b>Source:</b> <a href='https://t.me/c/{str(download.message.chat.id)[4:]}/{download.message.message_id}'>{download.message.from_user.first_name}</a> (<code>{download.message.from_user.id}</code>)"
                 msg += f"\n<b>Elapsed: </b>{get_readable_time(time() - download.message.date.timestamp())}"
-                msg += f"\n<b>Cancel:</b> <code>/{BotCommands.CancelMirror} {download.gid()}</code>"
+                msg += f"\n<code>/{BotCommands.CancelMirror} {download.gid()}</code>"
             elif download.status() == MirrorStatus.STATUS_SEEDING:
                 msg += f"\n<b>Size: </b>{download.size()}"
                 msg += f"\n<b>Speed: </b>{get_readable_file_size(download.torrent_info().upspeed)}/s"
@@ -249,6 +320,7 @@ def get_readable_message():
         bmsg += f"\n<b>DL:</b> {get_readable_file_size(dlspeed_bytes)}/s | <b>UL:</b> {get_readable_file_size(upspeed_bytes)}/s"
         buttons = ButtonMaker()
         buttons.sbutton("Refresh", str(ONE))
+        buttons.sbutton("Statistics", str(THREE))
         sbutton = InlineKeyboardMarkup(buttons.build_menu(3))
         if STATUS_LIMIT is not None and tasks > STATUS_LIMIT:
             buttons = ButtonMaker()
@@ -360,7 +432,7 @@ def refresh(update, context):
     query = update.callback_query
     query.edit_message_text(text="Refreshing Status...⏳")
     query.answer(text="Refreshed...", show_alert=False)
-    time.sleep(1)
+    time.sleep(2)
     update_all_messages()
     
 def close(update, context):
@@ -373,9 +445,40 @@ def close(update, context):
         delete_all_messages()
     else:
         query.answer(text="You Don't Have Admin Rights!", show_alert=True)
+        
+def pop_up_stats(update, context):
+    query = update.callback_query
+    stats = bot_sys_stats()
+    query.answer(text=stats, show_alert=True)
+
+def bot_sys_stats():
+    currentTime = get_readable_time(time.time() - botStartTime)
+    cpu = psutil.cpu_percent()
+    mem = psutil.virtual_memory().percent
+    disk = psutil.disk_usage("/").percent
+    total, used, free = shutil.disk_usage('.')
+    total = get_readable_file_size(total)
+    used = get_readable_file_size(used)
+    free = get_readable_file_size(free)
+    recv = get_readable_file_size(psutil.net_io_counters().bytes_recv)
+    sent = get_readable_file_size(psutil.net_io_counters().bytes_sent)
+    stats = f"""
+BOT UPTIME: {currentTime}
+
+CPU : {progress_bar(cpu)} {cpu}%
+RAM : {progress_bar(mem)} {mem}%
+
+DISK : {progress_bar(disk)} {disk}%
+TOTAL : {total}
+
+USED : {used} || FREE : {free}
+SENT : {sent} || RECV : {recv}
+"""
+    return stats
     
 dispatcher.add_handler(CallbackQueryHandler(refresh, pattern='^' + str(ONE) + '$'))
 dispatcher.add_handler(CallbackQueryHandler(close, pattern='^' + str(TWO) + '$'))
+dispatcher.add_handler(CallbackQueryHandler(pop_up_stats, pattern='^' + str(THREE) + '$'))
 
 next_handler = CallbackQueryHandler(turn, pattern="nex", run_async=True)
 previous_handler = CallbackQueryHandler(turn, pattern="pre", run_async=True)
