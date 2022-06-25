@@ -199,7 +199,7 @@ def get_readable_message():
                num_upload += 1 
             if stats.status() == MirrorStatus.STATUS_SEEDING:
                num_seeding += 1  
-        msg = f"<b>Active: {tasks}\nDL Tasks: {num_active} || UL Tasks: {num_upload} || Seeding: {num_seeding}</b>\n\n"
+        msg = f"<b><i>Active: {tasks}</i>\n\nDL Tasks: {num_active} || UL Tasks: {num_upload} || Seeding: {num_seeding}</b>\n\n"
         for index, download in enumerate(list(download_dict.values())[start:], start=1):
             msg += f"<b>Name:</b> <code>{download.name()}</code>"
             msg += f"\n<b>Status:</b> <i>{download.status()}</i>"
@@ -217,7 +217,6 @@ def get_readable_message():
                 else:
                     msg += f"\n<b>Downloaded:</b> {get_readable_file_size(download.processed_bytes())} of {download.size()}"
                 msg += f"\n<b>Speed:</b> {download.speed()} | <b>ETA:</b> {download.eta()}"
-                msg += f"\n<b>Time Elapsed: </b>{get_readable_time(time() - download.message.date.timestamp())}"
                 msg += f"\n<b>Engine:</b> <i>{download.eng()}</i>"
                 try:
                     msg += f"\n<b>Seeders:</b> {download.aria_download().num_seeders}" \
