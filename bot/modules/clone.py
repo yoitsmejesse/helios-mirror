@@ -33,7 +33,7 @@ def _clone(message, bot, multi=0):
             uname = f'<a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a>'
             botstart = f"http://t.me/{b_uname}"
             buttons.buildbutton("Click Here to Start Me", f"{botstart}")
-            startwarn = f"Dear {uname},\n\n<b>I found that you haven't started me in PM (Private Chat) yet.</b>\n\nFrom now on i will give link and leeched files in PM and log channel only"
+            startwarn = f"Hey {uname},\n\n<b>I found that you haven't started me in PM (Private Chat) yet.</b>\n\nFrom now on i will give link and leeched files in PM and log channel only"
             message = sendMarkup(startwarn, bot, message, InlineKeyboardMarkup(buttons.build_menu(2)))
             Thread(target=auto_delete_message, args=(bot, message, message)).start()
             return
@@ -123,7 +123,7 @@ def _clone(message, bot, multi=0):
                     update_all_messages()
             except IndexError:
                 pass
-        cc = f'\n\n<b>cc: </b>{tag}'
+        cc = f'\n\n<b>User: </b>{tag}'
         if button in ["cancelled", ""]:
             sendMessage(f"{tag} {result}", bot, message)
         else:
