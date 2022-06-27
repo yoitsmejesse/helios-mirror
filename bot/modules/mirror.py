@@ -257,7 +257,7 @@ class MirrorListener:
             msg += f'\n<b>Total Files: </b>{folders}'
             if typ != 0:
                 msg += f'\n<b>Corrupted Files: </b>{typ}'
-            msg += f'\n<b>cc: </b>{self.tag}\n\n'
+            msg += f'\n<b>User: </b>{self.tag}\n\n'
             if not files:
                 uploadmsg = sendMessage(msg, self.bot, self.message)
             else:
@@ -303,15 +303,21 @@ class MirrorListener:
                 buttons.buildbutton(f"{BUTTON_SIX_NAME}", f"{BUTTON_SIX_URL}")
             if SOURCE_LINK is True:
                 try:
-                    source_link = message_args[1]
-                    if is_magnet(source_link):
+                    mesg = message_args[1]
+                    if is_magnet(mesg):
                         link = telegraph.create_page(
                             title='Helios-Mirror Source Link',
-                            content=source_link,
+                            content=mesg,
                         )["path"]
                         buttons.buildbutton(f"🔗 Source Link", f"https://telegra.ph/{link}")
+                    elif is_url(mesg):
+                        source_link = mesg
+                        if source_link.startswith(("|", "pswd: ")):
+                            pass
+                        else:
+                            buttons.buildbutton(f"🔗 Source Link", source_link)
                     else:
-                        buttons.buildbutton(f"🔗 Source Link", source_link)
+                        pass
                 except Exception as e:
                     LOGGER.warning(e)
                     pass
@@ -331,6 +337,8 @@ class MirrorListener:
                 except Exception as e:
                     LOGGER.warning(e)
                     pass
+            else:
+                pass
             uploadmsg = sendMarkup(msg, self.bot, self.message, InlineKeyboardMarkup(buttons.build_menu(2)))
             Thread(target=auto_delete_upload_message, args=(bot, self.message, uploadmsg)).start()
             if MIRROR_LOGS:
