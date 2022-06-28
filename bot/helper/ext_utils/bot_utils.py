@@ -152,7 +152,7 @@ def get_readable_message():
                num_upload += 1 
             if stats.status() == MirrorStatus.STATUS_SEEDING:
                num_seeding += 1  
-        msg = f"<b><i><u> Active: {tasks}</u></i>\n\nDL Tasks: {num_active} | UL Tasks: {num_upload} | Seeding: {num_seeding}</b>\n\n"
+        msg = f"<b><i><u>Active: {tasks}</u></i>\n\nDL Tasks: {num_active} | UL Tasks: {num_upload} | Seeding: {num_seeding}</b>\n\n"
         for index, download in enumerate(list(download_dict.values())[start:], start=1):
             msg += f"<b>Name:</b> <code>{download.name()}</code>"
             msg += f"\n<b>Status:</b> <i>{download.status()}</i>"
@@ -239,17 +239,17 @@ def turn(update, context):
     query.answer()
     global COUNT, PAGE_NO
     if query.data == "nex":
+    update_all_messages()
         if PAGE_NO == pages:
             COUNT = 0
             PAGE_NO = 1
         else:
             COUNT += STATUS_LIMIT
-            update_all_messages()
             PAGE_NO += 1
     elif query.data == "pre":
+    update_all_messages()
         if PAGE_NO == 1:
             COUNT = STATUS_LIMIT * (pages - 1)
-            update_all_messages()
             PAGE_NO = pages
         else:
             COUNT -= STATUS_LIMIT
@@ -406,18 +406,22 @@ def bot_sys_stats():
     num_extract = 0
     num_archi = 0
     stats = f"""
-BOT UPTIME : {currentTime}
+UPTIME : {currentTime}
 
-<b>Cine Verse</b>
+🅽🅴🆇🆄🆂 9
 
-CPU : {progress_bar(cpu)} {cpu}%
 RAM : {progress_bar(mem)} {mem}%
 
+CPU : {cpu}%
+
 DISK : {progress_bar(disk)} {disk}%
+
 TOTAL : {total}
 
 USED : {used} | FREE : {free}
-SENT : {sent} | RECV : {recv}
+U: {sent}
+D: {recv}
+Tasks: {tasks} | DL Tasks: {num_active} | UL Tasks: {num_upload}
 """
     return stats
     
