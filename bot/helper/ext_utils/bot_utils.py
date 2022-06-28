@@ -4,7 +4,7 @@ import shutil
 import psutil
 from re import match as re_match, findall as re_findall
 from threading import Thread, Event
-from time import time
+from time import sleep, time
 from math import ceil
 from html import escape
 from psutil import virtual_memory, cpu_percent, disk_usage
@@ -15,6 +15,7 @@ from telegram.ext import CallbackContext, CallbackQueryHandler
 
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot import dispatcher, download_dict, download_dict_lock, STATUS_LIMIT, botStartTime, DOWNLOAD_DIR, OWNER_ID
+from bot.helper.telegram_helper.message_utils import sendMessage, sendMarkup, delete_all_messages, update_all_messages
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
 MAGNET_REGEX = r"magnet:\?xt=urn:btih:[a-zA-Z0-9]*"
@@ -172,7 +173,7 @@ def get_readable_message():
                num_upload += 1 
             if stats.status() == MirrorStatus.STATUS_SEEDING:
                num_seeding += 1  
-        msg = f"<b><i>Active: {tasks}</i>\n\nDL Tasks: {num_active} | UL Tasks: {num_upload} | Seeding: {num_seeding}</b>\n\n"
+        msg = f"<b><i><u>Active: {tasks}</u></i>\n\nDL Tasks: {num_active} | UL Tasks: {num_upload} | Seeding: {num_seeding}</b>\n\n"
         for index, download in enumerate(list(download_dict.values())[start:], start=1):
             msg += f"<b>Name:</b> <code>{download.name()}</code>"
             msg += f"\n<b>Status:</b> <i>{download.status()}</i>"
@@ -242,8 +243,7 @@ def get_readable_message():
         bmsg += f"\n<b>DL:</b> {get_readable_file_size(dlspeed_bytes)}/s | <b>UL:</b> {get_readable_file_size(upspeed_bytes)}/s"
         buttons = ButtonMaker()
         buttons.sbutton("Refresh", str(ONE))
-        #buttons.sbutton("Statistics", str(THREE))
-        sbutton = InlineKeyboardMarkup(buttons.build_menu(3))
+        sbutton = InlineKeyboardMarkup(buttons.build_menu(1))
         if STATUS_LIMIT is not None and tasks > STATUS_LIMIT:
             buttons = ButtonMaker()
             buttons.sbutton("Previous", "pre")
@@ -364,7 +364,7 @@ def close(update, context):
     query = update.callback_query
     admins = user_id in [OWNER_ID]
     if admins:
-        cancel_all()
+        delete_all_messages()
     else:
         query.answer(text="You Don't Have Admin Rights!", show_alert=True)
     
