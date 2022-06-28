@@ -53,6 +53,7 @@ class MirrorListener:
         self.isPrivate = self.message.chat.type in ['private', 'group']
         self.user_id = self.message.from_user.id
         reply_to = self.message.reply_to_message
+        self.uname = <a href='tg://user?id={user_id}'>{self.message.from_user.first_name}</a></u>
 
     def clean(self):
         try:
@@ -224,7 +225,7 @@ class MirrorListener:
                     source_link = message_args[1]
                     if is_magnet(source_link):
                         link = telegraph.create_page(
-                        title='Helios-Mirror Source Link',
+                        title='Source Link',
                         content=source_link,
                     )["path"]
                         buttons.buildbutton(f"🔗 Source Link", f"https://telegra.ph/{link}")
@@ -257,7 +258,7 @@ class MirrorListener:
             msg += f'\n<b>Total Files: </b>{folders}'
             if typ != 0:
                 msg += f'\n<b>Corrupted Files: </b>{typ}'
-            msg += f'\n<b>User: </b>{self.tag}\n\n'
+            msg += f'\n<b>User: </b>{self.uname} ({self.user_id})\n\n'
             if not files:
                 uploadmsg = sendMessage(msg, self.bot, self.message)
             else:
@@ -276,7 +277,7 @@ class MirrorListener:
             if ospath.isdir(f'{DOWNLOAD_DIR}{self.uid}/{name}'):
                 msg += f'\n<b>SubFolders: </b>{folders}'
                 msg += f'\n<b>Files: </b>{files}'
-            msg += f'\n\n<b>User: </b>{self.tag}'
+            msg += f'\n\n<b>User: </b>{self.uname} ({self.user_id})'
             buttons = ButtonMaker()
             link = short_url(link)
             buttons.buildbutton("☁️ Drive Link", link)
