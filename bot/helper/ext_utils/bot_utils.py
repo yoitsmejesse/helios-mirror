@@ -337,6 +337,9 @@ from bot import *
 from bot.helper.telegram_helper import message_utils
 from bot.helper.telegram_helper.message_utils import *
 
+FINISHED_PROGRESS_STR = "█"
+UNFINISHED_PROGRESS_STR = "░"
+
 def progress_bar(percentage):
     """Returns a progress bar for download
     """
