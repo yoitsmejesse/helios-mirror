@@ -239,19 +239,19 @@ def turn(update, context):
     query.answer()
     global COUNT, PAGE_NO
     if query.data == "nex":
-    update_all_messages()
         if PAGE_NO == pages:
             COUNT = 0
             PAGE_NO = 1
         else:
+            update_all_messages()
             COUNT += STATUS_LIMIT
             PAGE_NO += 1
     elif query.data == "pre":
-    update_all_messages()
         if PAGE_NO == 1:
             COUNT = STATUS_LIMIT * (pages - 1)
             PAGE_NO = pages
         else:
+            update_all_messages()
             COUNT -= STATUS_LIMIT
             PAGE_NO -= 1
         return True
