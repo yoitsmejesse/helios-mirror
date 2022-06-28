@@ -49,11 +49,11 @@ class MirrorListener:
         self.isQbit = isQbit
         self.isLeech = isLeech
         self.pswd = pswd
-        self.tag = tag
-        self.isPrivate = self.message.chat.type in ['private', 'group']
         self.user_id = self.message.from_user.id
+        self.user.first_name = self.message.from_user.first_name
+        self.isPrivate = self.message.chat.type in ['private', 'group']
         reply_to = self.message.reply_to_message
-        self.uname = <a href='tg://user?id={user_id}'>{self.message.from_user.first_name}</a>
+        self.uname = <a href='tg://user?id={user_id}'>{self.user.first_name}</a>
 
     def clean(self):
         try:
