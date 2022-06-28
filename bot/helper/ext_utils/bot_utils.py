@@ -7,7 +7,6 @@ from psutil import virtual_memory, cpu_percent, disk_usage
 from requests import head as rhead
 from urllib.request import urlopen
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import CallbackContext, CallbackQueryHandler
 
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot import dispatcher, download_dict, download_dict_lock, STATUS_LIMIT, botStartTime, DOWNLOAD_DIR, OWNER_ID
@@ -21,6 +20,9 @@ from telegram.ext import CallbackContext, CallbackQueryHandler
 from telegram.message import Message
 from telegram.update import Update
 from bot import *
+
+from bot.helper.telegram_helper import message_utils
+from bot.helper.telegram_helper.message_utils import *
 
 MAGNET_REGEX = r"magnet:\?xt=urn:btih:[a-zA-Z0-9]*"
 
