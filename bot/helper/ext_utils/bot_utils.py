@@ -14,11 +14,11 @@ from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext, CallbackQueryHandler
 from telegram.message import Message
 
+from bot.modules.cancel_mirror import cancel_all, cancel_all_update
+
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot import dispatcher, download_dict, download_dict_lock, STATUS_LIMIT, botStartTime, DOWNLOAD_DIR, OWNER_ID
 from bot.helper.telegram_helper.button_build import ButtonMaker
-
-from bot.modules.cancel_mirror import cancel_all
 
 MAGNET_REGEX = r"magnet:\?xt=urn:btih:[a-zA-Z0-9]*"
 
