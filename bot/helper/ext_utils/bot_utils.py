@@ -15,7 +15,6 @@ from telegram.ext import CallbackContext, CallbackQueryHandler
 from telegram.message import Message
 
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.modules.cancel_mirror import cancel_all, cancel_all_update
 from bot import dispatcher, download_dict, download_dict_lock, STATUS_LIMIT, botStartTime, DOWNLOAD_DIR, OWNER_ID
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
@@ -72,6 +71,25 @@ class setInterval:
 
     def cancel(self):
         self.stopEvent.set()
+                
+def sendStatusMessage(msg, bot):
+    if len(Interval) == 0:
+        Interval.append(setInterval(DOWNLOAD_STATUS_UPDATE_INTERVAL, update_all_messages))
+    progress, buttons = get_readable_message()
+    with status_reply_dict_lock:
+        if msg.message.chat.id in list(status_reply_dict):
+            try:
+                message = status_reply_dict[msg.message.chat.id]
+                deleteMessage(bot, message)
+                del status_reply_dict[msg.message.chat.id]
+            except Exception as e:
+                LOGGER.error(str(e))
+                del status_reply_dict[msg.message.chat.id]
+        if buttons == "":
+            message = sendMessage(progress, bot, msg)
+        else:
+            message = sendMarkup(progress, bot, msg, buttons)
+        status_reply_dict[msg.message.chat.id] = message
 
 def get_readable_file_size(size_in_bytes) -> str:
     if size_in_bytes is None:
@@ -155,7 +173,7 @@ def get_readable_message():
                num_upload += 1 
             if stats.status() == MirrorStatus.STATUS_SEEDING:
                num_seeding += 1  
-        msg = f"<b><i><u>Active: {tasks}</u></i>\n\nDL Tasks: {num_active} | UL Tasks: {num_upload} | Seeding: {num_seeding}</b>\n\n"
+        msg = f"<b><i>Active: {tasks}</i>\n\nDL Tasks: {num_active} || UL Tasks: {num_upload} || Seeding: {num_seeding}</b>\n\n"
         for index, download in enumerate(list(download_dict.values())[start:], start=1):
             msg += f"<b>Name:</b> <code>{download.name()}</code>"
             msg += f"\n<b>Status:</b> <i>{download.status()}</i>"
@@ -225,7 +243,8 @@ def get_readable_message():
         bmsg += f"\n<b>DL:</b> {get_readable_file_size(dlspeed_bytes)}/s | <b>UL:</b> {get_readable_file_size(upspeed_bytes)}/s"
         buttons = ButtonMaker()
         buttons.sbutton("Refresh", str(ONE))
-        sbutton = InlineKeyboardMarkup(buttons.build_menu(1))
+        #buttons.sbutton("Statistics", str(THREE))
+        sbutton = InlineKeyboardMarkup(buttons.build_menu(3))
         if STATUS_LIMIT is not None and tasks > STATUS_LIMIT:
             buttons = ButtonMaker()
             buttons.sbutton("Previous", "pre")
