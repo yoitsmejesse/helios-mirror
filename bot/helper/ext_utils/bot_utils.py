@@ -409,7 +409,7 @@ def bot_sys_stats():
     stats = f"""
 UPTIME : {currentTime}
 
-🅽🅴🆇🆄🆂 9
+        🅽🅴🆇🆄🆂 9
 
 RAM : {progress_bar(mem)} {mem}%
 CPU : {cpu}%
@@ -418,9 +418,8 @@ DISK : {progress_bar(disk)} {disk}%
 TOTAL : {total}
 
 USED : {used} | FREE : {free}
-U: {sent}
-D: {recv}
-Tasks: {tasks} | DL Tasks: {num_active} | UL Tasks: {num_upload}
+
+Uploaded: {sent} | Downloaded: {recv}
 """
     return stats
     
