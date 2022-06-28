@@ -15,6 +15,7 @@ from telegram.ext import CallbackContext, CallbackQueryHandler
 from telegram.message import Message
 
 from bot.helper.telegram_helper.bot_commands import BotCommands
+from bot.modules.cancel_mirror import cancel_all, cancel_all_update
 from bot import dispatcher, download_dict, download_dict_lock, STATUS_LIMIT, botStartTime, DOWNLOAD_DIR, OWNER_ID
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
@@ -71,51 +72,6 @@ class setInterval:
 
     def cancel(self):
         self.stopEvent.set()
-       
-def deleteMessage(bot, message: Message):
-    try:
-        bot.delete_message(chat_id=message.chat.id,
-                           message_id=message.message_id)
-    except Exception as e:
-        LOGGER.error(str(e))
-
-def auto_delete_message(bot, cmd_message: Message, bot_message: Message):
-    if AUTO_DELETE_MESSAGE_DURATION != -1:
-        time.sleep(AUTO_DELETE_MESSAGE_DURATION)
-        try:
-            # Skip if None is passed meaning we don't want to delete bot xor cmd message
-            deleteMessage(bot, cmd_message)
-            deleteMessage(bot, bot_message)
-        except AttributeError:
-            pass
-        
-def delete_all_messages():
-    with status_reply_dict_lock:
-        for message in list(status_reply_dict.values()):
-            try:
-                deleteMessage(bot, message)
-                del status_reply_dict[message.chat.id]
-            except Exception as e:
-                LOGGER.error(str(e))
-                
-def sendStatusMessage(msg, bot):
-    if len(Interval) == 0:
-        Interval.append(setInterval(DOWNLOAD_STATUS_UPDATE_INTERVAL, update_all_messages))
-    progress, buttons = get_readable_message()
-    with status_reply_dict_lock:
-        if msg.message.chat.id in list(status_reply_dict):
-            try:
-                message = status_reply_dict[msg.message.chat.id]
-                deleteMessage(bot, message)
-                del status_reply_dict[msg.message.chat.id]
-            except Exception as e:
-                LOGGER.error(str(e))
-                del status_reply_dict[msg.message.chat.id]
-        if buttons == "":
-            message = sendMessage(progress, bot, msg)
-        else:
-            message = sendMarkup(progress, bot, msg, buttons)
-        status_reply_dict[msg.message.chat.id] = message
 
 def get_readable_file_size(size_in_bytes) -> str:
     if size_in_bytes is None:
@@ -199,7 +155,7 @@ def get_readable_message():
                num_upload += 1 
             if stats.status() == MirrorStatus.STATUS_SEEDING:
                num_seeding += 1  
-        msg = f"<b><i>Active: {tasks}</i>\n\nDL Tasks: {num_active} || UL Tasks: {num_upload} || Seeding: {num_seeding}</b>\n\n"
+        msg = f"<b><i><u>Active: {tasks}</u></i>\n\nDL Tasks: {num_active} | UL Tasks: {num_upload} | Seeding: {num_seeding}</b>\n\n"
         for index, download in enumerate(list(download_dict.values())[start:], start=1):
             msg += f"<b>Name:</b> <code>{download.name()}</code>"
             msg += f"\n<b>Status:</b> <i>{download.status()}</i>"
@@ -269,8 +225,7 @@ def get_readable_message():
         bmsg += f"\n<b>DL:</b> {get_readable_file_size(dlspeed_bytes)}/s | <b>UL:</b> {get_readable_file_size(upspeed_bytes)}/s"
         buttons = ButtonMaker()
         buttons.sbutton("Refresh", str(ONE))
-        #buttons.sbutton("Statistics", str(THREE))
-        sbutton = InlineKeyboardMarkup(buttons.build_menu(3))
+        sbutton = InlineKeyboardMarkup(buttons.build_menu(1))
         if STATUS_LIMIT is not None and tasks > STATUS_LIMIT:
             buttons = ButtonMaker()
             buttons.sbutton("Previous", "pre")
@@ -389,62 +344,14 @@ def close(update, context):
     user_id = update.callback_query.from_user.id
     bot = context.bot
     query = update.callback_query
-    admins = bot.get_chat_member(chat_id, user_id).status in ['creator', 'administrator'] or user_id in [OWNER_ID]
+    admins = user_id in [OWNER_ID]
     if admins:
-        delete_all_messages()
+        cancel_all()
     else:
         query.answer(text="You Don't Have Admin Rights!", show_alert=True)
-        
-def pop_up_stats(update, context):
-    query = update.callback_query
-    stats = bot_sys_stats()
-    query.answer(text=stats, show_alert=True)
-def bot_sys_stats():
-    currentTime = get_readable_time(time() - botStartTime)
-    cpu = psutil.cpu_percent()
-    mem = psutil.virtual_memory().percent
-    disk = psutil.disk_usage(DOWNLOAD_DIR).percent
-    total, used, free = shutil.disk_usage(DOWNLOAD_DIR)
-    total = get_readable_file_size(total)
-    used = get_readable_file_size(used)
-    free = get_readable_file_size(free)
-    recv = get_readable_file_size(psutil.net_io_counters().bytes_recv)
-    sent = get_readable_file_size(psutil.net_io_counters().bytes_sent)
-    num_active = 0
-    num_upload = 0
-    num_split = 0
-    num_extract = 0
-    num_archi = 0
-    tasks = len(download_dict)
-    for stats in list(download_dict.values()):
-       if stats.status() == MirrorStatus.STATUS_DOWNLOADING:
-                num_active += 1
-       if stats.status() == MirrorStatus.STATUS_UPLOADING:
-                num_upload += 1
-       if stats.status() == MirrorStatus.STATUS_ARCHIVING:
-                num_archi += 1
-       if stats.status() == MirrorStatus.STATUS_EXTRACTING:
-                num_extract += 1
-       if stats.status() == MirrorStatus.STATUS_SPLITTING:
-                num_split += 1
-    stats = f"Bot Statistics"
-    stats += f"""
-BOT UPTIME: {currentTime}
-
-CPU : {progress_bar(cpu)} {cpu}%
-RAM : {progress_bar(mem)} {mem}%
-
-DISK : {progress_bar(disk)} {disk}%
-TOTAL : {total}
-
-USED : {used} || FREE : {free}
-SENT : {sent} || RECV : {recv}
-"""
-    return stats
     
 dispatcher.add_handler(CallbackQueryHandler(refresh, pattern='^' + str(ONE) + '$'))
 dispatcher.add_handler(CallbackQueryHandler(close, pattern='^' + str(TWO) + '$'))
-dispatcher.add_handler(CallbackQueryHandler(pop_up_stats, pattern='^' + str(THREE) + '$'))
 
 next_handler = CallbackQueryHandler(turn, pattern="nex", run_async=True)
 previous_handler = CallbackQueryHandler(turn, pattern="pre", run_async=True)
