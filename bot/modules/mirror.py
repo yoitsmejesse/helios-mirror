@@ -53,7 +53,7 @@ class MirrorListener:
         self.isPrivate = self.message.chat.type in ['private', 'group']
         self.user_id = self.message.from_user.id
         reply_to = self.message.reply_to_message
-        self.uname = <a href='tg://user?id={user_id}'>{self.message.from_user.first_name}</a></u>
+        self.uname = <a href='tg://user?id={user_id}'>{self.message.from_user.first_name}</a>
 
     def clean(self):
         try:
