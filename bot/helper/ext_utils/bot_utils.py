@@ -1,7 +1,3 @@
-import time
-import math
-import shutil
-import psutil
 from re import match as re_match, findall as re_findall
 from threading import Thread, Event
 from time import sleep, time
@@ -10,7 +6,7 @@ from html import escape
 from psutil import virtual_memory, cpu_percent, disk_usage
 from requests import head as rhead
 from urllib.request import urlopen
-from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext, CallbackQueryHandler
 
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -71,25 +67,6 @@ class setInterval:
     def cancel(self):
         self.stopEvent.set()
                 
-def sendStatusMessage(msg, bot):
-    if len(Interval) == 0:
-        Interval.append(setInterval(DOWNLOAD_STATUS_UPDATE_INTERVAL, update_all_messages))
-    progress, buttons = get_readable_message()
-    with status_reply_dict_lock:
-        if msg.message.chat.id in list(status_reply_dict):
-            try:
-                message = status_reply_dict[msg.message.chat.id]
-                deleteMessage(bot, message)
-                del status_reply_dict[msg.message.chat.id]
-            except Exception as e:
-                LOGGER.error(str(e))
-                del status_reply_dict[msg.message.chat.id]
-        if buttons == "":
-            message = sendMessage(progress, bot, msg)
-        else:
-            message = sendMarkup(progress, bot, msg, buttons)
-        status_reply_dict[msg.message.chat.id] = message
-
 def get_readable_file_size(size_in_bytes) -> str:
     if size_in_bytes is None:
         return '0B'
@@ -254,7 +231,6 @@ def get_readable_message():
             return(msg + bmsg, button)
         return(msg + bmsg, sbutton)
     
-
 def turn(update, context):
     query = update.callback_query
     query.answer()
@@ -356,7 +332,6 @@ def refresh(update, context):
     query = update.callback_query
     query.edit_message_text(text="Refreshing Status...⏳")
     query.answer(text="Refreshed...", show_alert=False)
-    time.sleep(2)
     update_all_messages()
     
 def close(update, context):
