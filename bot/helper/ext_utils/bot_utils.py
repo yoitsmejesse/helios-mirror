@@ -203,9 +203,9 @@ def get_readable_message():
                     pass
                 reply_to = download.message.reply_to_message    
                 if reply_to:
-                    msg += f"\n<b>Source:</b> <a href='https://t.me/c/{str(download.message.chat.id)[4:]}/{reply_to.message_id}'>{reply_to.message.from_user.first_name}</a> (<code>{download.message.from_user.id}</code>)"
+                    msg += f"\n<b>Source:</b> <a href='https://t.me/c/{str(download.message.chat.id)[4:]}/{reply_to.message_id}'>{download.message.from_user.first_name}</a> (<code>{download.message.from_user.id}</code>)"
                 else:
-                    msg += f"\n<b>Source:</b> <a href='https://t.me/c/{str(download.message.chat.id)[4:]}/{download.message.message_id}'>{reply_to.message.from_user.first_name}</a> (<code>{download.message.from_user.id}</code>)"
+                    msg += f"\n<b>Source:</b> <a href='https://t.me/c/{str(download.message.chat.id)[4:]}/{download.message.message_id}'>{download.message.from_user.first_name}</a> (<code>{download.message.from_user.id}</code>)"
                 msg += f"\n<b>Elapsed: </b>{get_readable_time(time() - download.message.date.timestamp())}"
                 msg += f"\n<code>/{BotCommands.CancelMirror} {download.gid()}</code>"
             elif download.status() == MirrorStatus.STATUS_SEEDING:
