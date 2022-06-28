@@ -12,9 +12,6 @@ from requests import head as rhead
 from urllib.request import urlopen
 from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext, CallbackQueryHandler
-from telegram.message import Message
-
-from bot.modules.cancel_mirror import cancel_all, cancel_all_update
 
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot import dispatcher, download_dict, download_dict_lock, STATUS_LIMIT, botStartTime, DOWNLOAD_DIR, OWNER_ID
@@ -175,7 +172,7 @@ def get_readable_message():
                num_upload += 1 
             if stats.status() == MirrorStatus.STATUS_SEEDING:
                num_seeding += 1  
-        msg = f"<b><i>Active: {tasks}</i>\n\nDL Tasks: {num_active} || UL Tasks: {num_upload} || Seeding: {num_seeding}</b>\n\n"
+        msg = f"<b><i>Active: {tasks}</i>\n\nDL Tasks: {num_active} | UL Tasks: {num_upload} | Seeding: {num_seeding}</b>\n\n"
         for index, download in enumerate(list(download_dict.values())[start:], start=1):
             msg += f"<b>Name:</b> <code>{download.name()}</code>"
             msg += f"\n<b>Status:</b> <i>{download.status()}</i>"
@@ -206,9 +203,9 @@ def get_readable_message():
                     pass
                 reply_to = download.message.reply_to_message    
                 if reply_to:
-                    msg += f"\n<b>Source:</b> <a href='https://t.me/c/{str(download.message.chat.id)[4:]}/{reply_to.message_id}'>{download.message.from_user.first_name}</a> (<code>{download.message.from_user.id}</code>)"
+                    msg += f"\n<b>Source:</b> <a href='https://t.me/c/{str(download.message.chat.id)[4:]}/{reply_to.message_id}'>{reply_to.message.from_user.first_name}</a> (<code>{download.message.from_user.id}</code>)"
                 else:
-                    msg += f"\n<b>Source:</b> <a href='https://t.me/c/{str(download.message.chat.id)[4:]}/{download.message.message_id}'>{download.message.from_user.first_name}</a> (<code>{download.message.from_user.id}</code>)"
+                    msg += f"\n<b>Source:</b> <a href='https://t.me/c/{str(download.message.chat.id)[4:]}/{download.message.message_id}'>{reply_to.message.from_user.first_name}</a> (<code>{download.message.from_user.id}</code>)"
                 msg += f"\n<b>Elapsed: </b>{get_readable_time(time() - download.message.date.timestamp())}"
                 msg += f"\n<code>/{BotCommands.CancelMirror} {download.gid()}</code>"
             elif download.status() == MirrorStatus.STATUS_SEEDING:
