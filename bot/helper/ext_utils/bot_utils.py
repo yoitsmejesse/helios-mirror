@@ -15,7 +15,6 @@ from telegram.ext import CallbackContext, CallbackQueryHandler
 
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot import dispatcher, download_dict, download_dict_lock, STATUS_LIMIT, botStartTime, DOWNLOAD_DIR, OWNER_ID
-from bot.helper.telegram_helper.message_utils import sendMessage, sendMarkup, delete_all_messages, update_all_messages
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
 MAGNET_REGEX = r"magnet:\?xt=urn:btih:[a-zA-Z0-9]*"
@@ -347,6 +346,8 @@ def get_content_type(link: str) -> str:
         except:
             content_type = None
     return content_type
+    
+from bot.helper.telegram_helper.message_utils import sendMessage, sendMarkup, delete_all_messages, update_all_messages
 
 ONE, TWO, THREE = range(3)
 
