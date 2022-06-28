@@ -15,14 +15,6 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 import math
 import shutil
 import psutil
-from telegram.error import RetryAfter
-from telegram.ext import CallbackContext, CallbackQueryHandler
-from telegram.message import Message
-from telegram.update import Update
-from bot import *
-
-from bot.helper.telegram_helper import message_utils
-from bot.helper.telegram_helper.message_utils import *
 
 MAGNET_REGEX = r"magnet:\?xt=urn:btih:[a-zA-Z0-9]*"
 
@@ -336,6 +328,15 @@ def get_content_type(link: str) -> str:
     return content_type
     
 from bot.helper.telegram_helper.message_utils import sendMessage, sendMarkup, delete_all_messages, update_all_messages
+
+from telegram.error import RetryAfter
+from telegram.ext import CallbackContext, CallbackQueryHandler
+from telegram.message import Message
+from telegram.update import Update
+from bot import *
+
+from bot.helper.telegram_helper import message_utils
+from bot.helper.telegram_helper.message_utils import *
 
 ONE, TWO, THREE = range(3)
 
