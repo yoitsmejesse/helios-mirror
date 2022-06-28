@@ -400,6 +400,7 @@ def bot_sys_stats():
     free = get_readable_file_size(free)
     recv = get_readable_file_size(psutil.net_io_counters().bytes_recv)
     sent = get_readable_file_size(psutil.net_io_counters().bytes_sent)
+    tasks = len(download_dict)
     num_active = 0
     num_upload = 0
     num_split = 0
@@ -411,9 +412,7 @@ UPTIME : {currentTime}
 🅽🅴🆇🆄🆂 9
 
 RAM : {progress_bar(mem)} {mem}%
-
 CPU : {cpu}%
-
 DISK : {progress_bar(disk)} {disk}%
 
 TOTAL : {total}
