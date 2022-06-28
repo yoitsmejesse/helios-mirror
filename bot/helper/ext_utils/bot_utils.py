@@ -337,6 +337,29 @@ from bot import *
 from bot.helper.telegram_helper import message_utils
 from bot.helper.telegram_helper.message_utils import *
 
+def progress_bar(percentage):
+    """Returns a progress bar for download
+    """
+    #percentage is on the scale of 0-1
+    comp = FINISHED_PROGRESS_STR
+    ncomp = UNFINISHED_PROGRESS_STR
+    pr = ""
+
+    if isinstance(percentage, str):
+        return "NaN"
+
+    try:
+        percentage=int(percentage)
+    except:
+        percentage = 0
+
+    for i in range(1,11):
+        if i <= int(percentage/10):
+            pr += comp
+        else:
+            pr += ncomp
+    return pr
+
 ONE, TWO, THREE = range(3)
 
 def refresh(update, context):
@@ -365,13 +388,18 @@ def bot_sys_stats():
     currentTime = get_readable_time(time() - botStartTime)
     cpu = psutil.cpu_percent()
     mem = psutil.virtual_memory().percent
-    disk = psutil.disk_usage("/").percent
-    total, used, free = shutil.disk_usage('.')
+    disk = psutil.disk_usage(DOWNLOAD_DIR).percent
+    total, used, free = shutil.disk_usage(DOWNLOAD_DIR)
     total = get_readable_file_size(total)
     used = get_readable_file_size(used)
     free = get_readable_file_size(free)
     recv = get_readable_file_size(psutil.net_io_counters().bytes_recv)
     sent = get_readable_file_size(psutil.net_io_counters().bytes_sent)
+    num_active = 0
+    num_upload = 0
+    num_split = 0
+    num_extract = 0
+    num_archi = 0
     stats = f"""
 BOT UPTIME : {currentTime}
 
@@ -383,8 +411,8 @@ RAM : {progress_bar(mem)} {mem}%
 DISK : {progress_bar(disk)} {disk}%
 TOTAL : {total}
 
-USED : {used} || FREE : {free}
-SENT : {sent} || RECV : {recv}
+USED : {used} | FREE : {free}
+SENT : {sent} | RECV : {recv}
 """
     return stats
     
