@@ -330,11 +330,10 @@ def get_content_type(link: str) -> str:
 from bot.helper.telegram_helper.message_utils import sendMessage, sendMarkup, delete_all_messages, update_all_messages
 
 from telegram.error import RetryAfter
-from telegram.ext import CallbackContext, CallbackQueryHandler
+from telegram.ext import CallbackQueryHandler
 from telegram.message import Message
 from telegram.update import Update
 from bot import *
-
 from bot.helper.telegram_helper import message_utils
 from bot.helper.telegram_helper.message_utils import *
 
@@ -363,7 +362,7 @@ def pop_up_stats(update, context):
     query.answer(text=stats, show_alert=True)
 
 def bot_sys_stats():
-    currentTime = get_readable_time(time.time() - botStartTime)
+    currentTime = get_readable_time(time() - botStartTime)
     cpu = psutil.cpu_percent()
     mem = psutil.virtual_memory().percent
     disk = psutil.disk_usage("/").percent
