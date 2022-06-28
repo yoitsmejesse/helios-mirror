@@ -244,10 +244,12 @@ def turn(update, context):
             PAGE_NO = 1
         else:
             COUNT += STATUS_LIMIT
+            update_all_messages()
             PAGE_NO += 1
     elif query.data == "pre":
         if PAGE_NO == 1:
             COUNT = STATUS_LIMIT * (pages - 1)
+            update_all_messages()
             PAGE_NO = pages
         else:
             COUNT -= STATUS_LIMIT
@@ -406,7 +408,7 @@ def bot_sys_stats():
     stats = f"""
 BOT UPTIME : {currentTime}
 
-Cine Verse
+<b>Cine Verse</b>
 
 CPU : {progress_bar(cpu)} {cpu}%
 RAM : {progress_bar(mem)} {mem}%
