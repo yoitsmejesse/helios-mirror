@@ -257,7 +257,7 @@ class MirrorListener:
             msg += f'\n<b>Total Files: </b>{folders}'
             if typ != 0:
                 msg += f'\n<b>Corrupted Files: </b>{typ}'
-            msg += f'\n<b>User: </b>{uname}<b> | Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'\n\n'
+            msg += f'\n<b>User: </b>{uname}<b> | Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}\n\n'
             if not files:
                 uploadmsg = sendMessage(msg, self.bot, self.message)
             else:
