@@ -53,7 +53,7 @@ class MirrorListener:
         self.isPrivate = self.message.chat.type in ['private', 'group']
         self.user_id = self.message.from_user.id
         reply_to = self.message.reply_to_message
-        uname = f'<a href="tg://user?id={self.message.from_user.id}">{self.message.from_user.first_name}</a>'
+        self.uname = f'<a href="tg://user?id={self.message.from_user.id}">{self.message.from_user.first_name}</a>'
     def clean(self):
         try:
             aria2.purge()
@@ -257,7 +257,7 @@ class MirrorListener:
             msg += f'\n<b>Total Files: </b>{folders}'
             if typ != 0:
                 msg += f'\n<b>Corrupted Files: </b>{typ}'
-            msg += f'\n<b>User: </b>{uname}<b> | Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}\n\n'
+            msg += f'\n<b>User: </b>{self.uname}<b> | Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}\n\n'
             if not files:
                 uploadmsg = sendMessage(msg, self.bot, self.message)
             else:
@@ -276,7 +276,7 @@ class MirrorListener:
             if ospath.isdir(f'{DOWNLOAD_DIR}{self.uid}/{name}'):
                 msg += f'\n<b>SubFolders: </b>{folders}'
                 msg += f'\n<b>Files: </b>{files}'
-            msg += f'\n<b>User: </b>{uname}<b> | Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'
+            msg += f'\n<b>User: </b>{self.uname}<b> | Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'
             buttons = ButtonMaker()
             link = short_url(link)
             buttons.buildbutton("☁️ Drive Link", link)
