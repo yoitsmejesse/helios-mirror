@@ -222,18 +222,20 @@ def get_readable_message():
                     upspeed_bytes += float(spd.split('M')[0]) * 1048576
         bmsg += f"\n<b>DL:</b> {get_readable_file_size(dlspeed_bytes)}/s | <b>UL:</b> {get_readable_file_size(upspeed_bytes)}/s"
         buttons = ButtonMaker()
-        buttons.sbutton("Refresh", str(ONE))
         buttons.sbutton("Stats", str(THREE))
+        buttons.sbutton("Refresh", str(ONE))
+        buttons.sbutton("Close", str(TWO))
         sbutton = InlineKeyboardMarkup(buttons.build_menu(2))
         if STATUS_LIMIT is not None and tasks > STATUS_LIMIT:
             buttons = ButtonMaker()
             buttons.sbutton("Previous", "pre")
             buttons.sbutton(f"{PAGE_NO}/{pages}", str(ONE))
             buttons.sbutton("Next", "nex")
+            buttons.sbutton("Stats", str(THREE))
             buttons.sbutton("Close", str(TWO))
             button = InlineKeyboardMarkup(buttons.build_menu(3))
             return(msg + bmsg, button)
-      return(photo, msg + bmsg, sbutton)
+      return(msg + bmsg, sbutton)
     
 def turn(update, context):
     query = update.callback_query
