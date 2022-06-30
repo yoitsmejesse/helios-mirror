@@ -8,8 +8,6 @@ from bot import AUTO_DELETE_MESSAGE_DURATION, LOGGER, status_reply_dict, status_
                 Interval, DOWNLOAD_STATUS_UPDATE_INTERVAL, RSS_CHAT_ID, bot, rss_session, AUTO_DELETE_UPLOAD_MESSAGE_DURATION
 from bot.helper.ext_utils.bot_utils import get_readable_message, setInterval
 
-photo = "https://telegra.ph/file/32ebc0c0611cd428ba801.jpg"
-
 def sendMessage(text: str, bot, message: Message):
     try:
         return bot.sendMessage(message.chat_id,
@@ -130,17 +128,17 @@ def auto_delete_upload_message(bot, cmd_message: Message, bot_message: Message):
         except AttributeError:
             pass
 def update_all_messages():
-    photo, msg, buttons = get_readable_message()
+    msg, buttons = get_readable_message()
     with status_reply_dict_lock:
         for chat_id in list(status_reply_dict.keys()):
             if status_reply_dict[chat_id] and msg != status_reply_dict[chat_id].text:
                 if buttons == "":
-                    editMessage(photo, msg, status_reply_dict[chat_id])
+                    editMessage(msg, status_reply_dict[chat_id])
                 else:
-                    editMessage(photo, msg, status_reply_dict[chat_id], buttons)
+                    editMessage(msg, status_reply_dict[chat_id], buttons)
                 status_reply_dict[chat_id].text = msg
 
-def sendStatusMessage(photo, msg, bot):
+def sendStatusMessage(msg, bot):
     if len(Interval) == 0:
         Interval.append(setInterval(DOWNLOAD_STATUS_UPDATE_INTERVAL, update_all_messages))
     progress, buttons = get_readable_message()
@@ -154,7 +152,7 @@ def sendStatusMessage(photo, msg, bot):
                 LOGGER.error(str(e))
                 del status_reply_dict[msg.chat.id]
         if buttons == "":
-            message = sendMessage(progress, photo, bot, msg)
+            message = sendMessage(progress, bot, msg)
         else:
-            message = sendMarkup(progress, photo, bot, msg, buttons)
+            message = sendMarkup(progress, bot, msg, buttons)
         status_reply_dict[msg.chat.id] = message
