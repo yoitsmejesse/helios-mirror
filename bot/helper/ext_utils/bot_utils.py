@@ -153,7 +153,6 @@ def get_readable_message():
                num_upload += 1 
             if stats.status() == MirrorStatus.STATUS_SEEDING:
                num_seeding += 1
-        msg = f"{photo}"
         msg = f"<b><i><u>Active: {tasks}</u></i>\n\nDL Tasks: {num_active} | UL Tasks: {num_upload} | Seeding: {num_seeding}</b>\n\n"
         for index, download in enumerate(list(download_dict.values())[start:], start=1):
             msg += f"<b>Name:</b> <code>{download.name()}</code>"
@@ -234,7 +233,7 @@ def get_readable_message():
             buttons.sbutton("Close", str(TWO))
             button = InlineKeyboardMarkup(buttons.build_menu(3))
             return(msg + bmsg, button)
-        return(msg + bmsg, sbutton)
+        return(photo + msg + bmsg, sbutton)
     
 def turn(update, context):
     query = update.callback_query
