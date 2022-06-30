@@ -135,6 +135,7 @@ def get_readable_message():
         uldl_bytes = 0
         START = 0
         num_active = 0
+        photo = IMAGE_X
         num_upload = 0
         num_seeding = 0
         if STATUS_LIMIT is not None:
@@ -151,7 +152,8 @@ def get_readable_message():
             if stats.status() == MirrorStatus.STATUS_UPLOADING:
                num_upload += 1 
             if stats.status() == MirrorStatus.STATUS_SEEDING:
-               num_seeding += 1  
+               num_seeding += 1
+        msg = f"{photo}"
         msg = f"<b><i><u>Active: {tasks}</u></i>\n\nDL Tasks: {num_active} | UL Tasks: {num_upload} | Seeding: {num_seeding}</b>\n\n"
         for index, download in enumerate(list(download_dict.values())[start:], start=1):
             msg += f"<b>Name:</b> <code>{download.name()}</code>"
