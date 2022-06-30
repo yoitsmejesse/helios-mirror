@@ -233,7 +233,8 @@ def get_readable_message():
             buttons.sbutton("Close", str(TWO))
             button = InlineKeyboardMarkup(buttons.build_menu(3))
             return(msg + bmsg, button)
-        return(photo + msg + bmsg, sbutton, parse_mode:='HTMl', disable_web_page_preview=True)
+        from bot.helper.telegram_helper.message_utils import sendMessage, sendMarkup, delete_all_messages, update_all_messages
+return bot.sendMessage(photo + msg + bmsg, sbutton, parse_mode:='HTMl', disable_web_page_preview=True)
     
 def turn(update, context):
     query = update.callback_query
