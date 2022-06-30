@@ -235,7 +235,7 @@ def get_readable_message():
             buttons.sbutton("Close", str(TWO))
             button = InlineKeyboardMarkup(buttons.build_menu(3))
             return(msg + bmsg, button)
-        return(photo, msg + bmsg, sbutton)
+        return(msg + bmsg, sbutton)
     
 def turn(update, context):
     query = update.callback_query
