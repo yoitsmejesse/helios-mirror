@@ -6,7 +6,7 @@ from html import escape
 from psutil import virtual_memory, cpu_percent, disk_usage
 from requests import head as rhead
 from urllib.request import urlopen
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ParseMode
 
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot import dispatcher, download_dict, download_dict_lock, STATUS_LIMIT, botStartTime, DOWNLOAD_DIR, OWNER_ID
@@ -233,7 +233,7 @@ def get_readable_message():
             buttons.sbutton("Close", str(TWO))
             button = InlineKeyboardMarkup(buttons.build_menu(3))
             return(msg + bmsg, button)
-        return(photo + msg + bmsg, sbutton)
+        return(photo + msg + bmsg, sbutton, parse_mode=ParseMode.HTML)
     
 def turn(update, context):
     query = update.callback_query
