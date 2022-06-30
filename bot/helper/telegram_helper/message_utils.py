@@ -6,8 +6,9 @@ from pyrogram.errors import FloodWait
 
 from bot import AUTO_DELETE_MESSAGE_DURATION, LOGGER, status_reply_dict, status_reply_dict_lock, \
                 Interval, DOWNLOAD_STATUS_UPDATE_INTERVAL, RSS_CHAT_ID, bot, rss_session, AUTO_DELETE_UPLOAD_MESSAGE_DURATION
-from bot.helper.ext_utils.bot_utils import get_readable_message, setInterval, photo
+from bot.helper.ext_utils.bot_utils import get_readable_message, setInterval
 
+photo = "https://telegra.ph/file/32ebc0c0611cd428ba801.jpg"
 
 def sendMessage(text: str, bot, message: Message):
     try:
@@ -129,14 +130,14 @@ def auto_delete_upload_message(bot, cmd_message: Message, bot_message: Message):
         except AttributeError:
             pass
 def update_all_messages():
-    msg, buttons = get_readable_message()
+    photo, msg, buttons = get_readable_message()
     with status_reply_dict_lock:
         for chat_id in list(status_reply_dict.keys()):
             if status_reply_dict[chat_id] and msg != status_reply_dict[chat_id].text:
                 if buttons == "":
-                    editMessage(msg, status_reply_dict[chat_id])
+                    editMessage(photo, msg, status_reply_dict[chat_id])
                 else:
-                    editMessage(msg, status_reply_dict[chat_id], buttons)
+                    editMessage(photo, msg, status_reply_dict[chat_id], buttons)
                 status_reply_dict[chat_id].text = msg
 
 def sendStatusMessage(photo, msg, bot):
