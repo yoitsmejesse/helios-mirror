@@ -67,7 +67,7 @@ def setLeechType(update, context):
         AS_DOC_USERS.add(user_id)
         if DB_URI is not None:
             DbManger().user_doc(user_id)
-        query.answer(text="Your File Will Deliver As Document!", show_alert=True)
+        query.answer(text="Your File Will Deliver As Document!", show_alert=False)
         editLeechType(message, query)
     elif data[2] == "med":
         if user_id in AS_DOC_USERS:
@@ -75,7 +75,7 @@ def setLeechType(update, context):
         AS_MEDIA_USERS.add(user_id)
         if DB_URI is not None:
             DbManger().user_media(user_id)
-        query.answer(text="Your File Will Deliver As Media!", show_alert=True)
+        query.answer(text="Your File Will Deliver As Media!", show_alert=False)
         editLeechType(message, query)
     elif data[2] == "thumb":
         path = f"Thumbnails/{user_id}.jpg"
@@ -83,10 +83,10 @@ def setLeechType(update, context):
             osremove(path)
             if DB_URI is not None:
                 DbManger().user_rm_thumb(user_id, path)
-            query.answer(text="Thumbnail Removed!", show_alert=True)
+            query.answer(text="Thumbnail Removed!", show_alert=False)
             editLeechType(message, query)
         else:
-            query.answer(text="Old Settings", show_alert=True)
+            query.answer(text="Old Settings", show_alert=False)
     else:
         query.answer()
         try:
