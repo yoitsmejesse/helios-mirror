@@ -222,7 +222,7 @@ def get_readable_message():
                     upspeed_bytes += float(spd.split('M')[0]) * 1048576
         bmsg += f"\n<b>DL:</b> {get_readable_file_size(dlspeed_bytes)}/s | <b>UL:</b> {get_readable_file_size(upspeed_bytes)}/s"
         buttons = ButtonMaker()
-        buttons.sbutton("Stats", str(THREE))
+        #buttons.sbutton("Stats", str(THREE))
         buttons.sbutton("Refresh", str(ONE))
         buttons.sbutton("Close", str(TWO))
         sbutton = InlineKeyboardMarkup(buttons.build_menu(2))
@@ -246,7 +246,6 @@ def turn(update, context):
             COUNT = 0
             PAGE_NO = 1
         else:
-            update_all_messages()
             COUNT += STATUS_LIMIT
             PAGE_NO += 1
     elif query.data == "pre":
@@ -254,7 +253,6 @@ def turn(update, context):
             COUNT = STATUS_LIMIT * (pages - 1)
             PAGE_NO = pages
         else:
-            update_all_messages()
             COUNT -= STATUS_LIMIT
             PAGE_NO -= 1
         return True
