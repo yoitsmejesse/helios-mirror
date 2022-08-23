@@ -236,7 +236,7 @@ def get_readable_message():
             button = InlineKeyboardMarkup(buttons.build_menu(3))
             return msg + bmsg, button
         return msg + bmsg, sbutton
-    
+
 def turn(data):
     try:
         with download_dict_lock:
