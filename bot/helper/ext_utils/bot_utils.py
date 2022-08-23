@@ -234,8 +234,8 @@ def get_readable_message():
             #buttons.sbutton("Stats", str(THREE))
             buttons.sbutton("Close", str(TWO))
             button = InlineKeyboardMarkup(buttons.build_menu(3))
-            return(msg + bmsg, button)
-        return(msg + bmsg, sbutton)
+            return msg + bmsg, button
+        return msg + bmsg, sbutton
     
 def turn(data):
     try:
