@@ -231,7 +231,7 @@ def get_readable_message():
             buttons.sbutton("Previous", "pre")
             buttons.sbutton(f"{PAGE_NO}/{pages}", str(ONE))
             buttons.sbutton("Next", "nex")
-            buttons.sbutton("Stats", str(THREE))
+            #buttons.sbutton("Stats", str(THREE))
             buttons.sbutton("Close", str(TWO))
             button = InlineKeyboardMarkup(buttons.build_menu(3))
             return(msg + bmsg, button)
@@ -412,7 +412,7 @@ def bot_sys_stats():
     stats = f"""
 UPTIME : {currentTime}
 
-               🅽🅴🆇🆄🆂 9
+🅽🅴🆇🆄🆂 9
 
 RAM : {progress_bar(mem)} {mem}%
 CPU : {cpu}%
