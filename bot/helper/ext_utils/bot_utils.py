@@ -127,28 +127,6 @@ def get_progress_bar_string(status):
     p_str += '□' * (12 - cFull)
     p_str = f"<i>{p_str}</i>"
     return p_str
-
-def turn(data):
-    try:
-        with download_dict_lock:
-            global COUNT, PAGE_NO
-            if data[1] == "nex":
-                if PAGE_NO == pages:
-                    COUNT = 0
-                    PAGE_NO = 1
-                else:
-                    COUNT += STATUS_LIMIT
-                    PAGE_NO += 1
-            elif data[1] == "pre":
-                if PAGE_NO == 1:
-                    COUNT = STATUS_LIMIT * (pages - 1)
-                    PAGE_NO = pages
-                else:
-                    COUNT -= STATUS_LIMIT
-                    PAGE_NO -= 1
-        return True
-    except:
-        return False
                 
 def get_readable_message():
     with download_dict_lock:
@@ -258,6 +236,28 @@ def get_readable_message():
             button = InlineKeyboardMarkup(buttons.build_menu(3))
             return msg + bmsg, button
         return msg + bmsg, sbutton
+
+def turn(data):
+    try:
+        with download_dict_lock:
+            global COUNT, PAGE_NO
+            if data[1] == "nex":
+                if PAGE_NO == pages:
+                    COUNT = 0
+                    PAGE_NO = 1
+                else:
+                    COUNT += STATUS_LIMIT
+                    PAGE_NO += 1
+            elif data[1] == "pre":
+                if PAGE_NO == 1:
+                    COUNT = STATUS_LIMIT * (pages - 1)
+                    PAGE_NO = pages
+                else:
+                    COUNT -= STATUS_LIMIT
+                    PAGE_NO -= 1
+        return True
+    except:
+        return False
 
 def get_readable_time(seconds: int) -> str:
     result = ''
@@ -431,8 +431,3 @@ Downloaded: {recv}
 dispatcher.add_handler(CallbackQueryHandler(refresh, pattern='^' + str(ONE) + '$'))
 dispatcher.add_handler(CallbackQueryHandler(close, pattern='^' + str(TWO) + '$'))
 dispatcher.add_handler(CallbackQueryHandler(pop_up_stats, pattern='^' + str(THREE) + '$'))
-
-next_handler = CallbackQueryHandler(turn, pattern="nex", run_async=True)
-previous_handler = CallbackQueryHandler(turn, pattern="pre", run_async=True)
-dispatcher.add_handler(next_handler)
-dispatcher.add_handler(previous_handler)
