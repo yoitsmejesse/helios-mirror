@@ -222,7 +222,6 @@ def get_readable_message():
                     upspeed_bytes += float(spd.split('M')[0]) * 1048576
         bmsg += f"\n<b>DL:</b> {get_readable_file_size(dlspeed_bytes)}/s | <b>UL:</b> {get_readable_file_size(upspeed_bytes)}/s"
         buttons = ButtonMaker()
-        #buttons.sbutton("Stats", str(THREE))
         buttons.sbutton("Refresh", str(ONE))
         buttons.sbutton("Close", str(TWO))
         sbutton = InlineKeyboardMarkup(buttons.build_menu(2))
@@ -231,7 +230,7 @@ def get_readable_message():
             buttons.sbutton("Previous", "status pre")
             buttons.sbutton(f"{PAGE_NO}/{pages}", str(ONE))
             buttons.sbutton("Next", "status nex")
-            #buttons.sbutton("Stats", str(THREE))
+            buttons.sbutton("Stats", str(THREE))
             buttons.sbutton("Close", str(TWO))
             button = InlineKeyboardMarkup(buttons.build_menu(3))
             return msg + bmsg, button
@@ -342,8 +341,8 @@ from bot import *
 from bot.helper.telegram_helper import message_utils
 from bot.helper.telegram_helper.message_utils import *
 
-FINISHED_PROGRESS_STR = "█"
-UNFINISHED_PROGRESS_STR = "░"
+FINISHED_PROGRESS_STR = "■"
+UNFINISHED_PROGRESS_STR = "□"
 
 def progress_bar(percentage):
     """Returns a progress bar for download
@@ -411,8 +410,7 @@ def bot_sys_stats():
     num_archi = 0
     stats = f"""
 UPTIME : {currentTime}
-
-🅽🅴🆇🆄🆂 9
+ネクサス 9
 
 RAM : {progress_bar(mem)} {mem}%
 CPU : {cpu}%
@@ -423,7 +421,6 @@ TOTAL : {total}
 USED : {used} | FREE : {free}
 
 Uploaded: {sent}
-
 Downloaded: {recv}
 """
     return stats
