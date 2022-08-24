@@ -228,34 +228,36 @@ def get_readable_message():
         sbutton = InlineKeyboardMarkup(buttons.build_menu(2))
         if STATUS_LIMIT is not None and tasks > STATUS_LIMIT:
             buttons = ButtonMaker()
-            buttons.sbutton("Previous", "pre")
+            buttons.sbutton("Previous", "status pre")
             buttons.sbutton(f"{PAGE_NO}/{pages}", str(ONE))
-            buttons.sbutton("Next", "nex")
+            buttons.sbutton("Next", "status nex")
             #buttons.sbutton("Stats", str(THREE))
             buttons.sbutton("Close", str(TWO))
             button = InlineKeyboardMarkup(buttons.build_menu(3))
             return msg + bmsg, button
         return msg + bmsg, sbutton
 
-def turn(update, context):
-    query = update.callback_query
-    query.answer()
-    global COUNT, PAGE_NO
-    if query.data == "nex":
-        if PAGE_NO == pages:
-            COUNT = 0
-            PAGE_NO = 1
-        else:
-            COUNT += STATUS_LIMIT
-            PAGE_NO += 1
-    elif query.data == "pre":
-        if PAGE_NO == 1:
-            COUNT = STATUS_LIMIT * (pages - 1)
-            PAGE_NO = pages
-        else:
-            COUNT -= STATUS_LIMIT
-            PAGE_NO -= 1
+def turn(data):
+    try:
+        with download_dict_lock:
+            global COUNT, PAGE_NO
+            if data[1] == "nex":
+                if PAGE_NO == pages:
+                    COUNT = 0
+                    PAGE_NO = 1
+                else:
+                    COUNT += STATUS_LIMIT
+                    PAGE_NO += 1
+            elif data[1] == "pre":
+                if PAGE_NO == 1:
+                    COUNT = STATUS_LIMIT * (pages - 1)
+                    PAGE_NO = pages
+                else:
+                    COUNT -= STATUS_LIMIT
+                    PAGE_NO -= 1
         return True
+    except:
+        return False
 
 def get_readable_time(seconds: int) -> str:
     result = ''
