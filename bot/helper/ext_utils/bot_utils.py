@@ -255,7 +255,7 @@ def turn(update, context):
         else:
             COUNT -= STATUS_LIMIT
             PAGE_NO -= 1
-    message_utils.update_all_messages()
+        return True
 
 def get_readable_time(seconds: int) -> str:
     result = ''
